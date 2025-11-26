@@ -1,168 +1,50 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Macronutrientes - NutriApp</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-success bg-gradient d-flex flex-column min-vh-100">
+{% extends "base.html" %}
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-        <div class="container">
-            <a class="navbar-brand mb-0 h1 fw-bold" href="index.html">NutriApp</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="calculadoras_dashboard.html">Calculadoras</a>
-                    </li>
-                </ul>
+{% block content %}
+
+<div class="col-md-6 mx-auto">
+<div class="card shadow-sm text-dark">
+<div class="card-header bg-success text-white">Calculadora de Distribución de Macronutrientes</div>
+
+    <div class="card-body">
+        <form method="post" action="{{ url_for('macros') }}">
+
+            <div class="mb-3">
+                <label class="form-label">TDEE (Gasto Calórico Total en kcal)</label>
+                <input type="number" name="tdee_macros" class="form-control" required placeholder="Introduce tu GCT">
             </div>
-        </div>
-    </nav>
 
-    <main class="container flex-grow-1 d-flex flex-column justify-content-start align-items-center py-5">
-        <div class="row w-100">
-            <div class="col-lg-6 col-md-8 mx-auto">
-                <h1 class="text-center mb-4 text-white">Calculadora de Macronutrientes (Gramos)</h1>
-                
-                <div class="bg-white p-5 rounded-4 shadow-lg text-dark">
-                    <h3 class="text-success mb-4">Distribución de Macronutrientes</h3>
-                    <p class="text-muted small">Tu GCT se puede cargar automáticamente si lo calculaste recientemente.</p>
+            <p class="mt-4 fw-bold">Distribución por Porcentaje (deben sumar 100%):</p>
 
-                    <form id="macrosForm">
-                        <div class="mb-3">
-                            <label for="tdee_macros" class="form-label">Gasto Calórico Total (Kcal):</label>
-                            <input type="number" id="tdee_macros" class="form-control" required placeholder="Ej: 2200" min="1" aria-label="Gasto Calórico Total">
-                        </div>
-                        <div class="row">
-                            <div class="col-4 mb-3">
-                                <label for="prot_perc" class="form-label">Proteínas (%):</label>
-                                <input type="number" id="prot_perc" class="form-control" required placeholder="Ej: 30" min="0" max="100" aria-label="Porcentaje de Proteínas">
-                            </div>
-                            <div class="col-4 mb-3">
-                                <label for="carb_perc" class="form-label">Carbohidratos (%):</label>
-                                <input type="number" id="carb_perc" class="form-control" required placeholder="Ej: 40" min="0" max="100" aria-label="Porcentaje de Carbohidratos">
-                            </div>
-                            <div class="col-4 mb-4">
-                                <label for="fat_perc" class="form-label">Grasas (%):</label>
-                                <input type="number" id="fat_perc" class="form-control" required placeholder="Ej: 30" min="0" max="100" aria-label="Porcentaje de Grasas">
-                            </div>
-                        </div>
-                        <p id="sum_warning" class="text-center text-danger small d-none">La suma de los porcentajes debe ser 100%.</p>
-                        <button type="submit" class="btn btn-success w-100 fw-bold py-2">Calcular Macronutrientes</button>
-                    </form>
-
-                    <div id="results" class="mt-5 p-4 rounded-4 shadow-lg d-none">
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label class="form-label">% Carbohidratos</label>
+                <input type="number" name="carb_perc" class="form-control" required min="0" max="100">
             </div>
-        </div>
-    </main>
 
-    <footer class="bg-dark text-white-50 text-center py-3 mt-auto">
-        <div class="container small">
-            <p class="mb-0">NutriApp &copy; 2024</p>
-        </div>
-    </footer>
+            <div class="mb-3">
+                <label class="form-label">% Proteínas</label>
+                <input type="number" name="prot_perc" class="form-control" required min="0" max="100">
+            </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Usando la clave de sessionStorage renombrada
-            const ultimoGCT = sessionStorage.getItem('ultimoGCT');
-            if (ultimoGCT) {
-                document.getElementById('tdee_macros').value = ultimoGCT;
-            }
-        });
+            <div class="mb-3">
+                <label class="form-label">% Grasas</label>
+                <input type="number" name="fat_perc" class="form-control" required min="0" max="100">
+            </div>
 
-        document.getElementById('macrosForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Renombrando la función principal
-            calcularYMostrarMacros();
-        });
+            <button class="btn btn-success w-100">Calcular Gramos</button>
+        </form>
+    </div>
+</div>
 
-        ['prot_perc', 'carb_perc', 'fat_perc'].forEach(id => {
-            document.getElementById(id).addEventListener('input', verificarSumaPorcentajes);
-        });
+{% if results and results.tipo == "macros" %}
+<div class="mt-4 p-4 bg-white text-dark rounded shadow-lg border-success border-4">
+    <h2 class="h4 text-success">Resultado: Macros en Gramos</h2>
+    <p><b>Carbohidratos:</b> <span class="fw-bold">{{ results.macros.carbohidratos_g }}</span> g</p>
+    <p><b>Proteínas:</b> <span class="fw-bold">{{ results.macros.proteinas_g }}</span> g</p>
+    <p class="mb-0"><b>Grasas:</b> <span class="fw-bold">{{ results.macros.grasas_g }}</span> g</p>
+</div>
+{% endif %}
 
-        // Renombrando las funciones a español
-        function verificarSumaPorcentajes() {
-            const prot = parseFloat(document.getElementById('prot_perc').value) || 0;
-            const carb = parseFloat(document.getElementById('carb_perc').value) || 0;
-            const fat = parseFloat(document.getElementById('fat_perc').value) || 0;
-            const suma = prot + carb + fat;
-            const warning = document.getElementById('sum_warning');
 
-            if (suma === 100) {
-                warning.classList.add('d-none');
-            } else {
-                warning.classList.remove('d-none');
-                warning.textContent = `La suma actual es ${suma}%. Debe ser 100%.`;
-            }
-        }
-
-        function calcularYMostrarMacros() {
-            const gct = parseFloat(document.getElementById('tdee_macros').value);
-            const protPerc = parseFloat(document.getElementById('prot_perc').value);
-            const carbPerc = parseFloat(document.getElementById('carb_perc').value);
-            const fatPerc = parseFloat(document.getElementById('fat_perc').value);
-            const resultsDiv = document.getElementById('results');
-
-            if (isNaN(gct) || isNaN(protPerc) || isNaN(carbPerc) || isNaN(fatPerc) || gct <= 0) {
-                mostrarError("Por favor, ingresa un Gasto Calórico y porcentajes válidos.");
-                return;
-            }
-
-            if ((protPerc + carbPerc + fatPerc) !== 100) {
-                mostrarError("La suma de los porcentajes de macronutrientes debe ser exactamente 100%.");
-                return;
-            }
-
-            const carbKcal = gct * (carbPerc / 100);
-            const protKcal = gct * (protPerc / 100);
-            const fatKcal = gct * (fatPerc / 100);
-
-            const carbG = (carbKcal / 4).toFixed(1);
-            const protG = (protKcal / 4).toFixed(1);
-            const fatG = (fatKcal / 9).toFixed(1);
-            const totalKcalVerificacion = carbKcal + protKcal + fatKcal;
-            
-            let resultHtml = `
-                <h4 class="text-center mb-3 text-success">Ingesta Diaria Recomendada (en gramos)</h4>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Carbohidratos (${carbPerc}%):
-                        <span class="badge bg-primary rounded-pill">${carbG} g</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Proteínas (${protPerc}%):
-                        <span class="badge bg-success rounded-pill">${protG} g</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Grasas (${fatPerc}%):
-                        <span class="badge bg-warning text-dark rounded-pill">${fatG} g</span>
-                    </li>
-                </ul>
-                <div class="alert alert-warning mt-3">
-                    Total Kcal Verificación: ${totalKcalVerificacion.toFixed(0)} Kcal.
-                </div>
-            `;
-
-            resultsDiv.innerHTML = resultHtml;
-            resultsDiv.classList.remove('d-none', 'bg-danger-subtle', 'text-danger');
-            resultsDiv.classList.add('bg-light');
-        }
-
-        function mostrarError(message) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <h2 class="mb-3 text-center text-danger">Error</h2>
-                <div class="alert alert-danger" role="alert">${message}</div>
-            `;
-            resultsDiv.classList.remove('d-none', 'bg-light');
-            resultsDiv.classList.add('bg-danger-subtle', 'text-danger');
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}
