@@ -6,60 +6,23 @@
     <title>NutriApp</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-success bg-gradient d-flex flex-column min-vh-100 text-white">
+<body class="bg-success bg-gradient text-white d-flex flex-column min-vh-100">
+{% extends "base.html" %}
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-        <div class="container">
-            <a class="navbar-brand mb-0 h1 fw-bold" href="index.html">NutriApp</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="calculadoras_dashboard.html">Calculadoras</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% block navbar_links %}{% endblock %}
 
-    <main class="container flex-grow-1 d-flex flex-column justify-content-center align-items-center py-5">
-        <div class="row w-100">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <h1 class="text-center mb-5 text-white">Elige una Herramienta Nutricional</h1>
-                
-                <div class="row g-4 justify-content-center">
-                    
-                    <div class="col-md-4 d-grid">
-                        <a href="imc_calculator.html" class="btn btn-light text-success shadow-sm h-100 d-flex flex-column justify-content-center py-4 rounded-4 text-decoration-none">
-                            <h5 class="fw-bold mb-1 text-success">IMC</h5>
-                            <p class="small mb-0 text-success">Índice de Masa Corporal</p>
-                        </a>
-                    </div>
+{% block content %}
 
-                    <div class="col-md-4 d-grid">
-                        <a href="tmb_gct_pci_calculator.html" class="btn btn-light text-success shadow-sm h-100 d-flex flex-column justify-content-center py-4 rounded-4 text-decoration-none">
-                            <h5 class="fw-bold mb-1 text-success">TMB / GCT / PCI</h5>
-                            <p class="small mb-0 text-success">Metabolismo y Peso Ideal</p>
-                        </a>
-                    </div>
+<h1 class="fw-bold mb-4 text-center">Dashboard de Calculadoras</h1>
 
-                    <div class="col-md-4 d-grid">
-                        <a href="macros_calculator.html" class="btn btn-light text-success shadow-sm h-100 d-flex flex-column justify-content-center py-4 rounded-4 text-decoration-none">
-                            <h5 class="fw-bold mb-1 text-success">Macronutrientes</h5>
-                            <p class="small mb-0 text-success">Distribución de Carbohidratos, Proteínas y Grasas</p>
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <footer class="bg-dark text-white-50 text-center py-3 mt-auto">
-        <div class="container small">
-            <p class="mb-0">NutriApp &copy; 2024 - Calculadoras</p>
-        </div>
-    </footer>
-    
+<div class="list-group">
+<a href="{{ url_for('imc') }}" class="list-group-item list-group-item-action">Calculadora IMC</a>
+<a href="{{ url_for('tmb') }}" class="list-group-item list-group-item-action">Tasa Metabólica Basal (TMB)</a>
+<a href="{{ url_for('gct') }}" class="list-group-item list-group-item-action">Gasto Calórico Total (GCT)</a>
+<a href="{{ url_for('peso_ideal') }}" class="list-group-item list-group-item-action">Calculadora de Peso Ideal</a>
+<a href="{{ url_for('macros') }}" class="list-group-item list-group-item-action">Calculadora de Macros</a>
+</div>
+{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
