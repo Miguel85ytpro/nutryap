@@ -1,111 +1,33 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de IMC - NutriApp</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-success bg-gradient d-flex flex-column min-vh-100">
+{% extends "base.html" %}
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-        <div class="container">
-            <a class="navbar-brand mb-0 h1 fw-bold" href="index.html">NutriApp</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="calculadoras_dashboard.html">Calculadoras</a>
-                    </li>
-                </ul>
+{% block content %}
+
+<div class="col-md-6 mx-auto">
+<div class="card shadow-sm text-dark">
+<div class="card-header bg-success text-white">Calculadora IMC</div>
+
+    <div class="card-body">
+        <form method="post" action="{{ url_for('imc') }}">
+            <div class="mb-3">
+                <label class="form-label">Peso (kg)</label>
+                <input type="number" name="weight_imc" class="form-control" step="0.01" required>
             </div>
-        </div>
-    </nav>
 
-    <main class="container flex-grow-1 d-flex flex-column justify-content-start align-items-center py-5">
-        <div class="row w-100">
-            <div class="col-lg-6 col-md-8 mx-auto">
-                <h1 class="text-center mb-4 text-white">Calculadora de Índice de Masa Corporal (IMC)</h1>
-                
-                <div class="bg-white p-5 rounded-4 shadow-lg text-dark">
-                    <h3 class="text-success mb-4">Ingresa tus datos</h3>
-                    
-                    <form id="imcForm">
-                        <div class="mb-3">
-                            <label for="weight_imc" class="form-label">Peso (kg):</label>
-                            <input type="number" step="0.1" id="weight_imc" class="form-control" required placeholder="Ej: 70.5" min="1" aria-label="Peso en kilogramos">
-                        </div>
-                        <div class="mb-4">
-                            <label for="height_imc" class="form-label">Altura (cm):</label>
-                            <input type="number" id="height_imc" class="form-control" required placeholder="Ej: 175" min="1" aria-label="Altura en centímetros">
-                        </div>
-                        <button type="submit" class="btn btn-success w-100 fw-bold py-2">Calcular IMC</button>
-                    </form>
-
-                    <div id="results" class="mt-5 p-4 rounded-4 shadow-lg d-none">
-                    </div>
-                </div>
+            <div class="mb-3">
+                <label class="form-label">Estatura (cm)</label>
+                <input type="number" name="height_imc" class="form-control" required>
             </div>
-        </div>
-    </main>
 
-    <footer class="bg-dark text-white-50 text-center py-3 mt-auto">
-        <div class="container small">
-            <p class="mb-0">NutriApp &copy; 2024</p>
-        </div>
-    </footer>
+            <button class="btn btn-success w-100">Calcular IMC</button>
+        </form>
+    </div>
+</div>
 
-    <script>
-        document.getElementById('imcForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            calculateAndDisplayIMC();
-        });
-
-        function calculateAndDisplayIMC() {
-            const weight = parseFloat(document.getElementById('weight_imc').value);
-            const heightCm = parseFloat(document.getElementById('height_imc').value);
-            const resultsDiv = document.getElementById('results');
-
-            if (isNaN(weight) || isNaN(heightCm) || weight <= 0 || heightCm <= 0) {
-                displayError("Por favor, ingresa valores numéricos válidos y positivos.");
-                return;
-            }
-
-            const heightM = heightCm / 100;
-            const imc = weight / (heightM * heightM);
-            const imcRounded = imc.toFixed(2);
-            const interpretation = interpretIMC(imc);
-            
-            let resultHtml = `
-                <h2 class="mb-3 text-center text-success">Resultado de Índice de Masa Corporal (IMC)</h2>
-                <p class="display-4 text-center mb-0 text-success">${imcRounded}</p>
-                <p class="lead text-center fw-bold">Clasificación: ${interpretation}</p>
-                <div class="alert alert-info mt-3" role="alert">
-                    El IMC es un indicador de salud, no un diagnóstico. Consulta a un profesional de la salud.
-                </div>
-            `;
-
-            resultsDiv.innerHTML = resultHtml;
-            resultsDiv.classList.remove('d-none', 'bg-danger-subtle', 'text-danger');
-            resultsDiv.classList.add('bg-light');
-        }
-
-        function interpretIMC(bmi) {
-            if (bmi < 18.5) return "Bajo peso";
-            if (bmi < 24.9) return "Peso normal";
-            if (bmi < 29.9) return "Sobrepeso";
-            return "Obesidad";
-        }
-
-        function displayError(message) {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = `
-                <h2 class="mb-3 text-center text-danger">Error</h2>
-                <div class="alert alert-danger" role="alert">${message}</div>
-            `;
-            resultsDiv.classList.remove('d-none', 'bg-light');
-            resultsDiv.classList.add('bg-danger-subtle', 'text-danger');
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% if results and results.tipo == "imc" %}
+<div class="mt-4 p-4 bg-white text-dark rounded shadow-lg border-success border-4">
+    <h2 class="h4 text-success">Resultado: Índice de Masa Corporal</h2>
+    <p class="mb-1"><b>IMC:</b> <span class="fw-bold">{{ results.imc }}</span></p>
+    <p class="mb-0"><b>Interpretación:</b> <span class="fw-bold">{{ results.interpretacion }}</span></p>
+</div>
+{% endif %}
+{% endblock %}
